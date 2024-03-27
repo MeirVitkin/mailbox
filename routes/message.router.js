@@ -4,7 +4,7 @@ const messageService = require('../BL/message.service');
 const { auth } = require('../middelweres/auth');
 
 
-router.post('/:messageId',auth,async (req, res) => {
+router.post('/:emailId',auth,async (req, res) => {
     try{
         const userEmail = req.body.user.email;
         const messageId = req.params.messageId;

@@ -8,7 +8,6 @@ async function read(filter) {
 }
 
 async function readOne(filter,isPopulate) {
-    console.log(filter);
     return await userModel.findOne({...filter, isActive: true}).populate(isPopulate?{
         path: 'emails.email',
             populate: {
