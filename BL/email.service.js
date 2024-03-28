@@ -7,43 +7,51 @@ async function getfilteredEmails(userId, filter) {
     const user = await userService.getUserEmails({ _id: userId, emails: { $elemMatch: filter } });
     return user?.emails || "nothing found";
 }
-
-async function updateIsReadEmail(userEmail, emailId, read) {
+async function updateEmailState(userEmail, emailId, state) {
 
     const user = await userService.getUser({ email: userEmail });
     if (user) {
         const messageIndex = user.emails.findIndex(emailObj => emailObj.email.equals(emailId));
         if (messageIndex !== -1) {
             let bool;
-            if (read) {
+            switch (state) {
+                case "isRead":
                 bool = user.emails[messageIndex].isRead;
                 user.emails[messageIndex].isRead = !bool;
-            } else {
+                    break;
+                case "isFavorite":
                 bool = user.emails[messageIndex].isFavorite;
                 user.emails[messageIndex].isFavorite = !bool;
+                    break;
+                case "isDeleted":
+                bool = user.emails[messageIndex].isDeleted;
+                user.emails[messageIndex].isDeleted = !bool;
+                    break;
+                case "isRecieved":
+                bool = user.emails[messageIndex].isRecieved;
+                user.emails[messageIndex].isRecieved = !bool;
+                    break;
+                case "isSent":
+                bool = user.emails[messageIndex].isSent;
+                user.emails[messageIndex].isSent = !bool;
+                    break;
+            
+                default:
+                    console.log("Unknown email");
+                    break;
             }
+            // if (state) {
+            //     bool = user.emails[messageIndex].isRead;
+            //     user.emails[messageIndex].isRead = !bool;
+            // } else {
+            //     bool = user.emails[messageIndex].isFavorite;
+            //     user.emails[messageIndex].isFavorite = !bool;
+            // }
         }
         return await user.save();
     }
     return "user not found";
 }
-
-async function updateIsFavoriteEmail(userEmail, emailId) {
-
-    const user = await userService.getUser({ email: userEmail });
-    if (user) {
-        const messageIndex = user.emails.findIndex(emailObj => emailObj.email.equals(emailId));
-        if (messageIndex !== -1) {
-            const bool = user.emails[messageIndex].isFavorite;
-            user.emails[messageIndex].isFavorite = !bool;
-        }
-        return await user.save();
-    }
-    return "user not found";
-}
-
-
-
 async function addNewMessageToEmail(emailId, msg) {
     let msgDB = await messageController.create(msg)
     let email = await emailController.readOne({ _id: emailId })
@@ -51,16 +59,15 @@ async function addNewMessageToEmail(emailId, msg) {
     return await email.save()
 
 }
-
 async function sendEmail(to, msg) {
     const filteredEmails = filterExistEmails(to);
     let msgDB = await messageController.create(msg)
-
+    //TODO
 
 
 }
-
-
+async function deleteEmail(userId, emailsMessages) {
+}
 async function filterExistEmails(emails) {
     const existingEmails = await Promise.all(emails.map(async (email) => {
         const user = await userService.getUser({ email });
@@ -78,6 +85,5 @@ module.exports = {
     addNewMessageToEmail,
     filterExistEmails,
     sendEmail,
-    updateIsReadEmail,
-    updateIsFavoriteEmail
+    updateEmailState
 };

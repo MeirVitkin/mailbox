@@ -99,8 +99,8 @@ router.put('/:emailId',auth,async (req, res) => {
     try{
         const userEmail = req.body.user.email;
         const emailId = req.params.emailId;
-        const read = req.body.read;
-        const result = await emailService.updateIsReadEmail(userEmail,emailId,read);
+        const state = req.body.state;
+        const result = await emailService.updateEmailState(userEmail,emailId,state);
         res.send(result);
     }catch(err){
         res.status(405).send(err.msg || err.message || "wrong")
