@@ -7,7 +7,7 @@ async function create(data) {
 async function read(filter, isPopulate) {
     return await userlModel.find(filter).populate(isPopulate ? 'msg':'');
 }
-async function readOne(filter) {
+async function readOne(filter, isPopulate) {
     return await emailModel.findOne(filter).populate(isPopulate ? 'msg':'');
 }
 async function update(id, data) {

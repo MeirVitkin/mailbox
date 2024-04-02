@@ -36,7 +36,7 @@ router.get('/inbox',auth, async (req, res) => {
     try{
         const userId = req.body.user.id;
 
-        const result = await emailService.getfilteredEmails(userId,{isRecieved:true})
+        const result = await emailService.getfilteredEmails(userId,"isRecieved")
         res.send(result)
 
     }catch(err){
@@ -49,7 +49,7 @@ router.get('/outgoing',auth, async (req, res) => {
     try{
         const userId = req.body.user.id;
 
-        const result = await emailService.getfilteredEmails(userId,{isSent:true})
+        const result = await emailService.getfilteredEmails(userId,"isSent")
         res.send(result)
 
     }catch(err){
@@ -62,7 +62,7 @@ router.get('/deleted',auth, async (req, res) => {
     try{
         const userId = req.body.user.id;
 
-        const result = await emailService.getfilteredEmails(userId,{isDeleted:true})
+        const result = await emailService.getfilteredEmails(userId,"isDeleted")
         res.send(result)
 
     }catch(err){
@@ -75,7 +75,7 @@ router.get('/favorite',auth, async (req, res) => {
     try{
         const userId = req.body.user.id;
 
-        const result = await emailService.getfilteredEmails(userId,{isFavorite:true})
+        const result = await emailService.getfilteredEmails(userId,"isFavorite")
         res.send(result)
 
     }catch(err){
