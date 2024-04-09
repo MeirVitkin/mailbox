@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-messageModel = require('./message.model');
 
 const userSchema = new mongoose.Schema({
 
@@ -12,24 +11,26 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    svatar:String,
+    avatar:String,
     password:{
         type: String,
         select: false
     },
-     emails: [{
-        email:{
+     chats: [{
+        chat:{
             type: mongoose.SchemaTypes.ObjectId,
-            ref: 'email',
+            ref: 'chat',
         },
         isSent:Boolean,
         isRecieved:Boolean,
         isFavorite:Boolean,
         isDeleted:Boolean,
+        isDraft:Boolean,
         isRead: {
             type:Boolean,
             default: false
         },
+        labels:[String]
      }],
      isActive:{
         type:Boolean,

@@ -1,7 +1,7 @@
 async function auth(req, res, next) {
     try{
         let token = req.headers.authorization?.split('Bearer ')[1];
-        let user = {id: "6602c49ceb02aca8db6f826f", email: "user2@example.com"};
+        let user = {_id: "6614e0b92018f4d5b33dd95d", email: "user1@example.com"};
         req.body.user = user;
         next();
     }catch{
