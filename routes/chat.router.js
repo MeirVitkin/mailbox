@@ -30,6 +30,17 @@ router.get('/',auth, async (req, res) => {
 
     }
 })
+router.get('/notifications',auth, async (req, res) => {
+    try{
+        const userId = req.body.user._id;
+        const result = await chatService.getNotifications(userId)
+        res.send(result)
+
+    }catch(err){
+        res.status(405).send(err.msg || err.message || "wrong")
+
+    }
+})
 
 router.get('/:flag',auth, async (req, res) => {
     try {

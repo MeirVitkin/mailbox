@@ -12,6 +12,25 @@ let funcs = {
     draft: [Flags.Draft],
 }
 
+async function getNotifications(userId) {
+    const user = await userService.getUser({ _id: userId });
+    let notifications = {
+        send: 0,
+        inbox: 0
+    }
+    if (user) {
+        user.chats.map(c => {
+            if (c.isRead === false && c.isSent ) {
+                 notifications.send = notifications.send + 1;
+            }
+            if (c.isRead === false && c.isRecieved) {
+                notifications.inbox = notifications.inbox + 1;
+            }
+        })
+    }
+    return notifications;
+}
+
 async function getChats(userId, flag) {
     if (!funcs[flag]) throw ""
     let { chats } = await userController.readByFlags(userId, funcs[flag], { chats: true, users: true });
@@ -19,7 +38,7 @@ async function getChats(userId, flag) {
 }
 async function updateReadChat(userId, chatId) {
     let user = await userController.readOne(userId);
-    user.chats.find(c => c._id == chatId).isRead=true
+    user.chats.find(c => c._id == chatId).isRead = true
     userController.save(user)
 }
 async function getfilteredChats(userId, filter) {
@@ -130,5 +149,6 @@ module.exports = {
     sendEmail,
     updateEmailState,
     getChats,
-    updateReadChat
+    updateReadChat,
+    getNotifications
 };
