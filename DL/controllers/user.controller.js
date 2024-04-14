@@ -7,13 +7,13 @@ async function create(data) {
 async function read(filter) {
     return await userModel.find({ ...filter, isActive: true })
 }
-async function readOne(filter, populate={}) {
-
-    let data = await userModel.findOne({ ...filter, isActive: true })
+async function readOne(filter, populate={} , password = false) { 
+    let data;
+    if (password){ data = await userModel.findOne({ ...filter, isActive: true }, '+password')}
+    else{ data = await userModel.findOne({ ...filter, isActive: true }) } 
     if(populate.chats) data=await data.populate('chats.chat')
-    if(populate.users) data=await data.populate('chats.chat.members')
-    
-    return data.toObject()
+    if(populate.users) data=await data.populate('chats.chat.members')    
+    return data?.toObject()
 }
 async function update(id, data) {
     return await userModel.findByIdAndUpdate(id, data, { new: true })

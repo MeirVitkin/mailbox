@@ -19,10 +19,11 @@ router.post('/', auth, async (req, res) => {
     
 })
 
-router.get('/',auth, async (req, res) => {
+router.get('/search/:leters',auth, async (req, res) => {
     try{
-        const userId = req.body.user.id;
-        const result = await emailService.getfilteredEmails(userId,{})
+        const userId = req.body.user._id;
+        const letersToSearch = req.params.leters
+        const result = await chatService.getChatsBySearch(userId, letersToSearch)
         res.send(result)
 
     }catch(err){
@@ -30,6 +31,17 @@ router.get('/',auth, async (req, res) => {
 
     }
 })
+// router.get('/:emailId',auth, async (req, res) => {
+//     try{
+//         const userId = req.body.user._id;
+//         const result = await chatService.getChats(userId,{_id:req.params.emailId})
+//         res.send(result)
+
+//     }catch(err){
+//         res.status(405).send(err.msg || err.message || "wrong")
+
+//     }
+// })
 router.get('/notifications',auth, async (req, res) => {
     try{
         const userId = req.body.user._id;

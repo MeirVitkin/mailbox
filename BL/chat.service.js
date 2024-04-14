@@ -41,6 +41,16 @@ async function updateReadChat(userId, chatId) {
     user.chats.find(c => c._id == chatId).isRead = true
     userController.save(user)
 }
+async function getChatsBySearch(userId , value){
+    const user = await userService.getUser({ _id: userId },{ chats: true, users: true });
+    if(user){
+        console.log(user.chats);
+        const filteredChats = user.chats.filter(c => c.chat.subject.toLowerCase().includes(value.toLowerCase()))
+        return filteredChats;
+        
+    }
+
+}
 async function getfilteredChats(userId, filter) {
     let filteredChats;
     const user = await userService.getUser({ _id: userId });
@@ -150,5 +160,6 @@ module.exports = {
     updateEmailState,
     getChats,
     updateReadChat,
-    getNotifications
+    getNotifications,
+    getChatsBySearch
 };

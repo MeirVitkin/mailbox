@@ -1,4 +1,5 @@
 const chatlModel = require('../models/chat.model');
+const userlModel = require('../models/user.model')
 
 
 async function create(data) {
