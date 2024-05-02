@@ -20,10 +20,10 @@ async function getNotifications(userId) {
     }
     if (user) {
         user.chats.map(c => {
-            if (c.isRead === false && c.isSent ) {
-                 notifications.send = notifications.send + 1;
+            if (c.isRead === false && c.isSent) {
+                notifications.send = notifications.send + 1;
             }
-            if (c.isRead === false && c.isRecieved) {
+            if (c.isRead === false && !c.isSent) {
                 notifications.inbox = notifications.inbox + 1;
             }
         })
@@ -41,13 +41,13 @@ async function updateReadChat(userId, chatId) {
     user.chats.find(c => c._id == chatId).isRead = true
     userController.save(user)
 }
-async function getChatsBySearch(userId , value){
-    const user = await userService.getUser({ _id: userId },{ chats: true, users: true });
-    if(user){
+async function getChatsBySearch(userId, value) {
+    const user = await userService.getUser({ _id: userId }, { chats: true, users: true });
+    if (user) {
         console.log(user.chats);
         const filteredChats = user.chats.filter(c => c.chat.subject.toLowerCase().includes(value.toLowerCase()))
         return filteredChats;
-        
+
     }
 
 }
@@ -132,34 +132,83 @@ async function addNewMessageToEmail(emailId, msg) {
     return await email.save()
 
 }
-async function sendEmail(to, msg) {
-    const filteredEmails = filterExistEmails(to);
-    let msgDB = await messageController.create(msg)
-    //TODO
+async function startChat(from, to, msg) {
+    try {
+        const filteredMembers = await filterExistEmails(to);
+        let msgData = {
+            subject: msg.subject,
+            msg: [{
+                from: from,
+                content: msg.content,
+            }],
+            members: filteredMembers,
+        }
+        const result = await chatController.create(msgData);
+        console.log(result._id);
+        if (!result) throw new Error("Could not create message");
+        // 661c41f140f0d8beab7cf7fb
+        const updateUserPromises = filteredMembers.map(async (member) => {
+            let user = await userController.readOne({ _id: member });
+ 
+            if (!user || from?.toString() === user?._id?.toString()) return;
 
+            let msg = {
+                chat: result._id,
+                isSent: false,
+                isRecieved: true
+            };
+            user.chats.push(msg);
 
+            return user.save();
+        });
+
+        await Promise.all(updateUserPromises);
+
+        let sender = await userController.readOne({ _id: from });
+        if (sender) {
+            let msg = {
+                chat: result._id,
+                isSent: true,
+                isReceived: false
+            };
+            sender.chats.push(msg);
+            await sender.save();
+        }
+
+        console.log("Chat creation and user updates completed successfully");
+    } catch (error) {
+        console.error("Error in starting chat:", error);
+        throw error;
+    }
 }
+
 async function deleteEmail(userId, emailsMessages) {
 }
 async function filterExistEmails(emails) {
-    const existingEmails = await Promise.all(emails.map(async (email) => {
+    const existingMembers = await Promise.all(emails.map(async (email) => {
         const user = await userService.getUser({ email });
-        if (user !== null) {
-            return email;
+        if (user) {
+            return user._id;
         }
     }));
 
-    return existingEmails.filter(email => email);
+    return existingMembers.filter(member => member);
 }
+async function go() {
+    const msg = { subject: "Starting a new job", content: "Hi there and now that you have a new job you can start a new job and start a new job with the following parameters and the following parameters and the following parameters and the following parameters and the following parameters and the following parameters and the following parameters and the following parameters and the following parameters and the following parameters and the following parameters and the following parameters and the following parameters and the following parameters and the following parameters and the following parameters and the following parameters and the following parameters and the following parameters and the following parameters and the following parameters and the following parameters and the following parameters and the following parameters and the following parameters and the following parameters and the following parameters and the following parameters and the following parameters and the following parameters and following" };
+    await startChat('6614e0b92018f4d5b33dd95d', ['meir@gmail.com', 'user2@example.com', 'user3@example.com'], msg);
+}
+//   go()
 
 module.exports = {
     getfilteredChats,
     addNewMessageToEmail,
     filterExistEmails,
-    sendEmail,
+    sendEmail: startChat,
     updateEmailState,
     getChats,
     updateReadChat,
     getNotifications,
-    getChatsBySearch
+    getChatsBySearch,
+    startChat
 };

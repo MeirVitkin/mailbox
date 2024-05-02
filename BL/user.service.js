@@ -14,7 +14,6 @@ async function getUserEmails(filter) {
 async function login(data) {
     const user = await userController.readOne({ email: data.email },  { chats: false, users: false },true);
     if (!user) throw { msg: 'User not found' }
-    console.log(user);
     const correctPassword = bcrypt.compareSync(data.password, user.password)
     if (!correctPassword) throw { msg: 'password mismatch' }
     const token = createToken(user);

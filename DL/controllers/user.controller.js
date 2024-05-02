@@ -13,7 +13,7 @@ async function readOne(filter, populate={} , password = false) {
     else{ data = await userModel.findOne({ ...filter, isActive: true }) } 
     if(populate.chats) data=await data.populate('chats.chat')
     if(populate.users) data=await data.populate('chats.chat.members')    
-    return data?.toObject()
+    return data
 }
 async function update(id, data) {
     return await userModel.findByIdAndUpdate(id, data, { new: true })
@@ -25,11 +25,9 @@ async function save(user) {
     return await user.save()
 }
 async function readByFlags(id, flags = [], populate = {}) {
-
     let data = await userModel.findOne({ _id: id, isActive: true })
 
-    console.log(data)
-    if(data){
+        if(data){
     data.chats = data.chats.filter(c => flags.every(f => {
         if (typeof f === 'object') {
             let [[k, v]] = Object.entries(f)

@@ -3,6 +3,9 @@ const express = require('express'),
 const userService = require('../BL/user.service');
 const { auth } = require('../middelweres/auth');
 
+router.all('/protected',auth,async(req, res) => {
+    res.send(req.body.user);
+})
 
 router.get('/:userId',auth,async (req, res) => {
     try{
